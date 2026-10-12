@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus Execute Finish</title>
+    
+    <!-- Meta untuk PWA (Install App) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/7604/7604310.png">
+    <link id="manifest-link" rel="manifest" href="">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        slate: { 850: '#151e2e', 900: '#0f172a', 950: '#020617' },
+                        primary: '#4f46e5',
+                        primaryHover: '#4338ca',
+                        accent: '#38bdf8'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(79, 70, 229, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; color: #0f172a; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+        
+        /* Premium Radio Buttons */
+        .priority-radio:checked + label {
+            background-color: #0f172a;
+            color: white;
+            border-color: #0f172a;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Animasi Pop-up Modal (Tengah Layar) */
+        .modal-active { display: flex !important; }
+        .modal-bg-blur { backdrop-filter: blur(12px); background-color: rgba(15, 23, 42, 0.6); }
+        .modal-bounce-in { animation: modalBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        
+        @keyframes modalBounce {
+            0% { transform: scale(0.95) translateY(15px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* Task Card Hover Effect */
+        .task-card { transition: all 0.3s ease; }
+        .task-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04); border-color: #cbd5e1; }
+
+        /* Premium Dashboard Gradient */
+        .glass-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 20px 40px rgba(15,23,42,0.4);
+        }
+
+        /* Neon Timer Glow */
+        .timer-glow { text-shadow: 0 0 30px rgba(255, 255, 255, 0.3); }
+        
+        /* List Fade-in Animation */
+        .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col md:flex-row overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- NAVIGASI KIRI -->
+    <nav id="mainNav" class="w-full md:w-[280px] bg-white border-r border-slate-200/80 flex flex-col justify-between z-40 relative shadow-sm md:shadow-none flex-shrink-0">
+        <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-12">
+                <div class="w-12 h-12 bg-gradient-to-br from-primary to-indigo-700 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-glow">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 leading-none">FOCUS</h1>
+                    <h2 class="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mt-1.5">Execute. Finish.</h2>
+                </div>
+            </div>
+            
+            <ul class="space-y-2.5">
+                <li>
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold bg-slate-900 text-white transition-all shadow-md">
+                        <i class="fa-solid fa-compass w-5 text-center text-accent"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('inbox')" id="tab-inbox" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="fa-solid fa-inbox w-5 text-center"></i> Inbox Tugas
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('review')" id="tab-review" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="fa-solid fa-chart-simple w-5 text-center"></i> Review & Stats
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="p-6 md:p-8 pt-0 hidden md:block">
+            <!-- Profil Akun & Status Sinkronisasi -->
+            <div class="bg-slate-50/80 backdrop-blur border border-slate-200/80 rounded-2xl p-4 text-center mb-6 relative overflow-hidden group hover:bg-slate-100 transition-colors">
+                <div class="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl -mr-10 -mt-10"></div>
+                <div class="w-12 h-12 bg-white border border-slate-200 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl shadow-sm relative z-10 group-hover:text-primary transition-colors">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <p id="user-email-display" class="text-[11px] font-bold text-slate-700 truncate mb-1 relative z-10">Akun Tamu (Offline)</p>
+                <div class="flex items-center justify-center gap-2 mb-4 relative z-10">
+                    <span id="cloud-indicator-dot" class="flex h-2 w-2 rounded-full bg-slate-300"></span>
+                    <p id="cloud-status-text" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sinkronisasi Lokal</p>
+                </div>
+                
+                <button id="btn-auth-action" onclick="openAuthModal()" class="relative z-10 w-full py-2.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Hubungkan Cloud
+                </button>
+
+                <!-- Tombol Install PWA -->
+                <button id="btn-install-app" onclick="promptInstall()" class="hidden relative z-10 w-full mt-3 py-2.5 bg-blue-500 text-white text-xs font-bold rounded-xl hover:bg-blue-600 transition-all shadow-sm shadow-blue-500/30 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Install Aplikasi (PWA)
+                </button>
+            </div>
+
+            <!-- Score Widget -->
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl p-5 shadow-xl relative overflow-hidden border border-slate-800 flex items-center justify-between">
+                <div class="absolute top-0 right-0 -mr-4 -mt-4 w-20 h-20 rounded-full bg-primary opacity-20 blur-2xl"></div>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Focus Score</p>
+                    <p class="text-xs text-slate-500 font-medium">Prestasi Anda</p>
+                </div>
+                <p class="text-3xl font-black text-white drop-shadow-md" id="nav-focus-score">0</p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- KONTEN UTAMA -->
+    <main class="flex-1 overflow-y-auto hide-scroll relative scroll-smooth">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="p-6 md:p-12 lg:p-16 max-w-5xl mx-auto block pb-24 fade-in-up">
+            <div class="mb-10 flex items-end justify-between">
+                <div>
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Halo, Waktunya Fokus.</h2>
+                    <p class="text-slate-500 text-sm md:text-base font-medium">Sistem telah memilihkan eksekusi terbaik untuk Anda saat ini.</p>
+                </div>
+                <div class="hidden md:block w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-xl text-slate-300">
+                    <i class="fa-regular fa-sun"></i>
+                </div>
+            </div>
+
+            <div id="dashboard-target-container" class="mb-12"></div>
+
+            <div id="dashboard-queue-container" class="hidden">
+                <h3 class="text-xs font-bold tracking-[0.15em] uppercase mb-5 text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group"></i> Antrean Selanjutnya
+                </h3>
+                <div id="dashboard-queue-list" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+            </div>
+        </section>
+
+        <!-- INBOX VIEW -->
+        <section id="view-inbox" class="p-6 md:p-12 lg:p-16 max-w-4xl mx-auto hidden pb-24">
+            <div class="mb-10">
+                <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Inbox Tugas</h2>
+                <p class="text-slate-500 font-medium">Kosongkan pikiran Anda. Jangan dikerjakan, cukup catat semuanya di sini.</p>
+            </div>
+
+            <!-- Form Tambah Tugas Premium -->
+            <div class="bg-white rounded-3xl p-1 shadow-soft border border-slate-200/60 mb-10 transition-all" id="form-container">
+                <form id="form-add-task" onsubmit="addTask(event)" class="bg-slate-50/50 rounded-[22px] p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <div class="flex-1 flex flex-col gap-3">
+                            <input type="text" id="task-title" placeholder="Apa yang perlu diselesaikan? (Ketik lalu Enter)" required
+                                class="w-full bg-white border-none shadow-sm rounded-2xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-bold text-lg placeholder:font-medium placeholder:text-slate-400">
+                            <input type="text" id="task-desc" placeholder="Tambahkan catatan atau detail opsional..." 
+                                class="w-full bg-transparent border-none px-5 py-2 text-slate-600 text-sm focus:outline-none focus:bg-white focus:shadow-sm focus:rounded-xl transition-all placeholder:text-slate-400">
+                        </div>
+                        <div class="flex items-stretch pt-1">
+                            <button type="submit" id="btn-submit-task" class="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary transition-all shadow-md hover:shadow-lg hover:shadow-primary/30 whitespace-nowrap flex items-center justify-center min-w-[160px]">
+                                <i class="fa-solid fa-paper-plane mr-2"></i> Masukkan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-200/60">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Tingkat Dampak</p>
+                            <div class="flex bg-slate-200/50 rounded-xl p-1 gap-1">
+                                <input type="radio" name="impact" id="i1" value="1" class="hidden priority-radio">
+                                <label for="i1" class="flex-1 text-center py-2 text-xs font-bold text-slate-500 rounded-lg cursor-pointer transition-all">Biasa</label>
+                                <input type="radio" name="impact" id="i2" value="2" class="hidden priority-radio" checked>
+                                <label for="i2" class="flex-1 text-center py-2 text-xs font-bold text-slate-500 rounded-lg cursor-pointer transition-all">Penting</label>
+                                <input type="radio" name="impact" id="i3" value="3" class="hidden priority-radio">
+                                <label for="i3" class="flex-1 text-center py-2 text-xs font-bold text-slate-500 rounded-lg cursor-pointer transition-all">Krusial</label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Tenggat Waktu</p>
+                            <div class="relative">
+                                <input type="datetime-local" id="task-deadline" class="w-full bg-white border border-slate-200/60 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer shadow-sm h-[34px]">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Beban Waktu (Estimasi)</p>
+                            <div class="flex bg-slate-200/50 rounded-xl p-1 gap-1">
+                                <input type="radio" name="size" id="s1" value="1" class="hidden priority-radio">
+                                <label for="s1" class="flex-1 text-center py-2 text-[10px] font-bold text-slate-500 rounded-lg cursor-pointer transition-all flex items-center justify-center leading-none" title="Kurang dari 30 menit">Ringan</label>
+                                <input type="radio" name="size" id="s2" value="2" class="hidden priority-radio" checked>
+                                <label for="s2" class="flex-1 text-center py-2 text-[10px] font-bold text-slate-500 rounded-lg cursor-pointer transition-all flex items-center justify-center leading-none" title="1-2 Jam">Menengah</label>
+                                <input type="radio" name="size" id="s3" value="3" class="hidden priority-radio">
+                                <label for="s3" class="flex-1 text-center py-2 text-[10px] font-bold text-slate-500 rounded-lg cursor-pointer transition-all flex items-center justify-center leading-none" title="Berjam-jam">Berat</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex items-center justify-between mb-6 bg-gradient-to-r from-blue-50 to-indigo-50/30 p-4 px-5 rounded-2xl border border-blue-100/50 shadow-sm">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-full bg-blue-100/80 flex items-center justify-center text-blue-600 shadow-inner"><i class="fa-solid fa-wand-magic-sparkles text-sm"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800">Sistem Auto-Prioritas Aktif</h3>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">Kami menyortir semua tugas di atas dan memilihkan yang terbaik di Dashboard.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="inbox-list" class="space-y-3.5"></div>
+        </section>
+
+        <!-- REVIEW VIEW -->
+        <section id="view-review" class="p-6 md:p-12 lg:p-16 max-w-5xl mx-auto hidden pb-24">
+            <div class="mb-12">
+                <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Review & Evaluasi</h2>
+                <p class="text-slate-500 font-medium">Pantau kinerja dan kelola distraksi yang sempat Anda parkir hari ini.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
+                <div class="bg-white p-6 rounded-[24px] border border-slate-200/60 text-center shadow-soft relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-slate-200"></div>
+                    <p class="text-4xl font-black text-slate-900 mb-2 mt-2" id="stat-sessions">0</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sesi Fokus</p>
+                </div>
+                <div class="bg-white p-6 rounded-[24px] border border-slate-200/60 text-center shadow-soft relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-400"></div>
+                    <p class="text-4xl font-black text-emerald-500 mb-2 mt-2" id="stat-completed">0</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Diselesaikan</p>
+                </div>
+                <div class="bg-white p-6 rounded-[24px] border border-slate-200/60 text-center shadow-soft relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-amber-400"></div>
+                    <p class="text-4xl font-black text-amber-500 mb-2 mt-2" id="stat-distractions">0</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ide Terparkir</p>
+                </div>
+                <div class="glass-gradient p-6 rounded-[24px] text-center shadow-xl text-white relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                    <p class="text-4xl font-black mb-2 mt-2 text-white drop-shadow-md" id="stat-score">0</p>
+                    <p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Focus Score</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-1 rounded-[24px] shadow-soft border border-slate-200/60">
+                    <div class="bg-slate-50/50 rounded-[20px] p-6 h-full">
+                        <h3 class="text-xs font-bold text-emerald-600 uppercase tracking-[0.15em] mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-check-double"></i> Pekerjaan Rampung
+                        </h3>
+                        <div id="completed-list" class="space-y-3 min-h-[150px]"></div>
+                    </div>
+                </div>
+                <div class="bg-amber-50/30 p-1 rounded-[24px] border border-amber-200/50 shadow-soft">
+                    <div class="bg-white/50 rounded-[20px] p-6 h-full">
+                        <h3 class="text-xs font-bold text-amber-600 uppercase tracking-[0.15em] mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-square-parking"></i> Area Parkir (Distraksi)
+                        </h3>
+                        <div id="parking-list" class="space-y-3 min-h-[150px]"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS & OVERLAYS ================= -->
+    
+    <!-- Modal Detail Tugas (Premium Pop-up) -->
+    <div id="modal-task-detail" class="fixed inset-0 z-[70] hidden justify-center items-center p-4 modal-bg-blur transition-all duration-300">
+        <div id="task-modal-content" class="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh] border border-white/20 relative">
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="p-8 md:p-10 border-b border-slate-100 flex justify-between items-start bg-white/50 relative">
+                <div class="pr-10 z-10">
+                    <div class="flex items-center gap-2 mb-4" id="modal-badge-container"></div>
+                    <h3 id="modal-task-title" class="font-black text-3xl md:text-4xl text-slate-900 leading-tight tracking-tight">Judul Tugas</h3>
+                </div>
+                <button onclick="closeTaskModal()" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition-all shadow-sm absolute top-8 right-8 z-20">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-8 md:p-10 overflow-y-auto hide-scroll flex-1 bg-slate-50/50">
+                <p id="modal-task-desc" class="text-slate-600 mb-8 text-sm md:text-base leading-relaxed hidden bg-white p-5 rounded-2xl border border-slate-100 shadow-sm"></p>
+                
+                <div class="mb-4 flex items-center justify-between">
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-[0.15em] flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-primary"></i> Langkah Eksekusi (Breakdown)
+                    </h4>
+                </div>
+                
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="modal-input-subtask" placeholder="Ketik langkah kecil di sini lalu Enter..." class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all shadow-sm">
+                    <button id="modal-btn-add-subtask" class="bg-slate-900 text-white px-6 py-3.5 rounded-xl text-sm font-bold hover:bg-primary transition-all shadow-md"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                
+                <div id="modal-subtask-list" class="space-y-2.5"></div>
+            </div>
+
+            <div class="p-6 px-8 md:px-10 border-t border-slate-100 bg-white flex justify-between items-center flex-wrap gap-4 relative z-10">
+                <button id="modal-btn-edit" class="text-slate-500 hover:text-primary font-bold text-sm flex items-center gap-2 transition-colors px-4 py-2.5 rounded-xl hover:bg-indigo-50">
+                    <i class="fa-solid fa-pen-to-square"></i> Koreksi
+                </button>
+                <button id="modal-btn-start" class="bg-gradient-to-r from-slate-900 to-slate-800 text-white px-8 py-4 rounded-2xl font-bold hover:shadow-lg hover:shadow-slate-900/30 transition-all flex items-center gap-3 scale-100 hover:scale-105 active:scale-95 origin-center">
+                    <i class="fa-solid fa-play text-accent"></i> Mulai Fokus Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Login / Register (Akun) -->
+    <div id="modal-auth" class="fixed inset-0 z-[80] hidden justify-center items-center p-4 modal-bg-blur transition-all duration-300">
+        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-8 modal-bounce-in relative border border-slate-100">
+            <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-300 hover:text-slate-900 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center mb-8 mt-2">
+                <div class="w-14 h-14 bg-gradient-to-br from-primary to-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-glow"><i class="fa-solid fa-cloud"></i></div>
+                <h3 class="font-black text-2xl text-slate-900 tracking-tight" id="auth-title">Masuk Akun</h3>
+                <p class="text-sm text-slate-500 mt-1.5 font-medium" id="auth-subtitle">Akses data Anda di semua perangkat</p>
+            </div>
+            
+            <form id="auth-form" class="space-y-4.5" onsubmit="handleAuthSubmit(event)">
+                <div class="mb-4">
+                    <input type="email" id="auth-email" required placeholder="Alamat Email" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-5 py-4 text-sm focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all font-medium placeholder:text-slate-400">
+                </div>
+                <div class="mb-6">
+                    <input type="password" id="auth-password" required placeholder="Kata Sandi (Min. 6)" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-5 py-4 text-sm focus:ring-2 focus:ring-primary/30 focus:bg-white transition-all font-medium placeholder:text-slate-400">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-md hover:bg-primary transition-all text-sm tracking-wide">Masuk & Sinkronisasi</button>
+            </form>
+            
+            <p class="text-center text-sm text-slate-500 mt-6 font-medium">
+                <span id="auth-toggle-text">Belum punya akun?</span> 
+                <button onclick="toggleAuthMode()" class="font-bold text-primary hover:text-primaryHover ml-1 transition-colors" id="auth-toggle-btn">Daftar</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal Selesai Sesi -->
+    <div id="modal-finish" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden text-center modal-bounce-in p-8 border border-slate-100">
+            <div class="w-16 h-16 bg-emerald-50 border border-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-5 text-3xl shadow-inner">
+                <i class="fa-solid fa-flag-checkered"></i>
+            </div>
+            <h3 class="font-black text-2xl text-slate-900 mb-2 tracking-tight">Waktu Habis!</h3>
+            <p class="text-sm text-slate-500 mb-8 font-medium">Sesi dihentikan. Apakah tugas ini sudah rampung 100%?</p>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="processFinish('completed')" class="w-full py-4 text-sm font-bold bg-slate-900 text-white rounded-xl shadow-md hover:bg-emerald-600 transition-all flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-check-double text-emerald-400"></i> Ya, Tugas Rampung
+                </button>
+                <button onclick="processFinish('inbox')" class="w-full py-4 text-sm font-bold bg-white text-slate-700 rounded-xl hover:bg-slate-50 transition-all flex justify-center items-center gap-2 border-2 border-slate-200">
+                    <i class="fa-solid fa-pause text-amber-500"></i> Belum, Kembalikan ke Inbox
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Panduan Install iOS -->
+    <div id="modal-ios-install" class="fixed inset-0 z-[90] hidden justify-center items-end md:items-center p-4 modal-bg-blur transition-all duration-300">
+        <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-sm p-8 modal-bounce-in relative mb-10 md:mb-0 border border-slate-100">
+            <button onclick="document.getElementById('modal-ios-install').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="text-center mb-6 mt-2">
+                <i class="fa-brands fa-apple text-5xl text-slate-900 mb-4 drop-shadow-sm"></i>
+                <h3 class="font-black text-2xl text-slate-900 tracking-tight">Install di iPhone / iPad</h3>
+                <p class="text-sm text-slate-500 mt-2 font-medium">Dapatkan pengalaman penuh tanpa gangguan bar browser.</p>
+            </div>
+            
+            <div class="bg-slate-50 rounded-2xl p-5 text-sm text-slate-700 font-medium space-y-4 border border-slate-200/60">
+                <p class="flex items-center gap-3"><span class="w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-xs shadow-sm">1</span> Tekan tombol <i class="fa-solid fa-arrow-up-from-bracket text-blue-500 text-lg mx-1"></i> (Bagikan) di bawah layar Safari.</p>
+                <p class="flex items-center gap-3"><span class="w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-xs shadow-sm">2</span> Gulir ke bawah dan pilih <b>Add to Home Screen</b> (Tambahkan ke Layar Utama).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Layar Penuh Mode Fokus (Timer) - Premium Dark Mode -->
+    <div id="overlay-focus" class="fixed inset-0 bg-slate-950 z-50 flex flex-col hidden transition-opacity duration-500 opacity-0 overflow-hidden">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-900/20 blur-[120px] pointer-events-none"></div>
+
+        <div class="p-6 md:p-8 flex justify-between items-center text-white relative z-10">
+            <button onclick="minimizeFocus()" class="text-slate-400 hover:text-white flex items-center gap-2.5 text-sm font-medium transition-all bg-white/5 px-5 py-2.5 rounded-xl hover:bg-white/10 backdrop-blur-sm border border-white/10">
+                <i class="fa-solid fa-down-left-and-up-right-to-center"></i> Minimize (Jeda Layar)
+            </button>
+            <div class="flex items-center gap-3 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20">
+                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
+                <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest">Focus Mode</span>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col justify-center items-center p-6 text-center relative z-10">
+            <p class="text-[10px] font-bold tracking-[0.2em] text-accent uppercase mb-5">Sedang Dieksekusi</p>
+            <h2 id="focus-title-display" class="text-4xl md:text-6xl font-black text-white mb-4 max-w-4xl leading-tight tracking-tight drop-shadow-lg">Judul Tugas</h2>
+            <p id="focus-desc-display" class="text-slate-400 mb-12 max-w-2xl mx-auto text-sm md:text-base font-medium leading-relaxed"></p>
+            
+            <div class="flex items-center justify-center gap-6 md:gap-10 mb-14">
+                <button onclick="adjustTimer(-5)" class="w-14 h-14 rounded-full bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center text-xl border border-white/10 hover:scale-105 active:scale-95" title="Kurangi 5 Menit">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <div id="timer-display" class="text-[120px] md:text-[200px] font-light text-white tabular-nums tracking-tighter leading-none timer-glow">25:00</div>
+                <button onclick="adjustTimer(5)" class="w-14 h-14 rounded-full bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center text-xl border border-white/10 hover:scale-105 active:scale-95" title="Tambah 5 Menit">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="toggleTimer()" id="btn-timer-action" class="bg-primary text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-primaryHover transition-all shadow-glow min-w-[220px] scale-100 hover:scale-105 active:scale-95">
+                    Mulai
+                </button>
+                <button onclick="finishSession()" class="bg-white/5 text-white px-8 py-5 rounded-2xl font-bold text-lg hover:bg-red-500/20 hover:text-red-400 transition-all border border-white/10 hover:border-red-500/30 flex items-center gap-2">
+                    Akhiri Sesi Lebih Awal <i class="fa-solid fa-stop text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-10 w-full max-w-2xl mx-auto relative z-10">
+            <div class="bg-white/5 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 shadow-2xl">
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-square-parking text-amber-400"></i> Area Parkir Ide
+                </label>
+                <p class="text-sm text-slate-400 mb-4">Ada ide terlintas? Jangan dikerjakan, parkir di sini agar otak tetap lega.</p>
+                <div class="flex gap-3">
+                    <input type="text" id="focus-park-input" placeholder="Misal: Cek email dari klien..." class="flex-1 bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors placeholder:text-slate-500">
+                    <button onclick="parkFromFocus()" class="bg-amber-500 text-slate-950 px-6 py-4 rounded-xl text-sm font-bold hover:bg-amber-400 transition-colors">Parkir Ide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini Timer Floating Widget -->
+    <div id="mini-timer" onclick="resumeFocus()" class="fixed bottom-6 right-6 bg-slate-900 text-white p-3.5 pr-6 rounded-2xl shadow-2xl z-[55] flex items-center gap-4 cursor-pointer hover:bg-slate-800 transition-all transform translate-y-20 opacity-0 hidden border border-slate-700 hover:scale-105 group">
+        <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-inner relative overflow-hidden">
+            <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span></span>
+        </div>
+        <div>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 truncate max-w-[140px] group-hover:text-primary transition-colors" id="mini-timer-title">Tugas Aktif</p>
+            <p class="text-2xl font-black leading-none tabular-nums text-white" id="mini-timer-display">25:00</p>
+        </div>
+    </div>
+
+    <!-- MODULE CLOUD DATABASE (FIREBASE INTEGRATION) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let firebaseConfig = {};
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        }
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'fef-app-premium';
+        
+        window.db = null; window.auth = null; window.currentUser = null;
+
+        if(Object.keys(firebaseConfig).length > 0) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                window.auth = getAuth(app);
+                window.db = getFirestore(app);
+            } catch(e) { console.error("Gagal inisialisasi Firebase", e); }
+        }
+
+        window.initAuthSystem = async function() {
+            if (!window.auth) return false;
+            let user = window.auth.currentUser;
+            if (!user) {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        const creds = await signInWithCustomToken(window.auth, __initial_auth_token);
+                        user = creds.user;
+                    } else {
+                        const creds = await signInAnonymously(window.auth);
+                        user = creds.user;
+                    }
+                } catch(e) { return false; }
+            }
+
+            onAuthStateChanged(window.auth, async (u) => {
+                window.currentUser = u;
+                updateProfileUI();
+                if(u) await window.loadDataFromCloud();
+            });
+            return true;
+        };
+
+        window.FEF_Login = async function(email, password) {
+            if(!window.auth) throw new Error("Cloud Database Offline");
+            return await signInWithEmailAndPassword(window.auth, email, password);
+        };
+
+        window.FEF_Register = async function(email, password) {
+            if(!window.auth) throw new Error("Cloud Database Offline");
+            const tempState = JSON.parse(JSON.stringify(window.getAppState())); 
+            const creds = await createUserWithEmailAndPassword(window.auth, email, password);
+            window.currentUser = creds.user;
+            await window.saveDataToCloud(tempState);
+            return creds;
+        };
+
+        window.FEF_Logout = async function() {
+            if(window.auth) { await signOut(window.auth); window.location.reload(); }
+        };
+
+        window.saveDataToCloud = async function(stateData) {
+            if (!window.db || !window.currentUser) return false;
+            try {
+                const docRef = doc(window.db, 'artifacts', appId, 'users', window.currentUser.uid, 'fef_data', 'state');
+                await setDoc(docRef, stateData);
+                
+                const cloudStatus = document.getElementById('cloud-status-text');
+                const cloudDot = document.getElementById('cloud-indicator-dot');
+                cloudStatus.innerText = "Tersimpan";
+                cloudDot.className = "flex h-2 w-2 rounded-full bg-emerald-400";
+                setTimeout(() => { cloudStatus.innerText = "Cloud Auto-Sync"; }, 2000);
+                return true;
+            } catch(e) { return false; }
+        };
+
+        window.loadDataFromCloud = async function() {
+            if (!window.db || !window.currentUser) return null;
+            try {
+                const docRef = doc(window.db, 'artifacts', appId, 'users', window.currentUser.uid, 'fef_data', 'state');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    window.applyStateFromCloud(docSnap.data());
+                    return true;
+                }
+                return false;
+            } catch(e) { return false; }
+        };
+
+        setTimeout(() => { window.initAuthSystem(); }, 500);
+    </script>
+
+    <!-- LOGIKA UTAMA APLIKASI -->
+    <script>
+        let appState = { tasks: [], stats: { sessions: 0, completed: 0, distractions: 0 }, activeTaskId: null, editingTaskId: null };
+
+        // ==========================================
+        // 1. SISTEM PWA (INSTALL APP)
+        // ==========================================
+        const manifestData = {
+            name: "Focus Execute Finish", short_name: "FEF App", start_url: window.location.href, display: "standalone",
+            background_color: "#0f172a", theme_color: "#0f172a",
+            icons: [{ src: "https://cdn-icons-png.flaticon.com/512/7604/7604310.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
+        const manifestLink = document.getElementById('manifest-link');
+        if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
+
+        const swCode = `self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('activate', (e) => e.waitUntil(clients.claim())); self.addEventListener('fetch', (e) => {});`;
+        const swBlob = new Blob([swCode], {type: 'application/javascript'});
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{}); }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); deferredPrompt = e;
+            checkInstallStatus();
+        });
+
+        function checkInstallStatus() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            const btn = document.getElementById('btn-install-app');
+            // Menampilkan tombol jika web dibuka di browser biasa (bukan full-screen app)
+            if(!isStandalone && btn) { btn.classList.remove('hidden'); }
+        }
+        
+        setTimeout(checkInstallStatus, 1000); // Cek 1 detik setelah dimuat
+
+        function promptInstall() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                // Tampilkan Pop-up panduan untuk pengguna Apple
+                document.getElementById('modal-ios-install').classList.remove('hidden');
+                document.getElementById('modal-ios-install').classList.add('flex');
+            } else if (deferredPrompt) {
+                // Tampilkan pop-up instalasi asli Chrome/Android
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { 
+                    deferredPrompt = null; 
+                    if(choiceResult.outcome === 'accepted') {
+                        document.getElementById('btn-install-app').classList.add('hidden'); 
+                    }
+                });
+            } else { 
+                showToast("Klik titik tiga di browser Anda lalu pilih 'Install' atau 'Add to Home Screen'.", "info"); 
+            }
+        }
+        // ==========================================
+
+
+        // UI Helpers
+        function showToast(msg, type='success') {
+            const toast = document.createElement('div');
+            const color = type === 'success' ? 'bg-slate-900' : (type === 'error' ? 'bg-red-500' : 'bg-blue-600');
+            const icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+            toast.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 ${color} text-white px-6 py-3.5 rounded-2xl shadow-2xl z-[100] text-sm font-bold transition-all duration-300 opacity-0 translate-y-8 flex items-center gap-3`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-8'), 10);
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-8'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function switchTab(tabId) {
+            ['dashboard', 'inbox', 'review'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                if(t === tabId) {
+                    btn.classList.replace('text-slate-500', 'text-white');
+                    btn.classList.replace('hover:bg-slate-50', 'bg-slate-900');
+                    btn.classList.replace('hover:text-slate-900', 'text-white');
+                    btn.classList.add('shadow-md');
+                } else {
+                    btn.classList.replace('text-white', 'text-slate-500');
+                    btn.classList.replace('bg-slate-900', 'hover:bg-slate-50');
+                    btn.classList.add('hover:text-slate-900');
+                    btn.classList.remove('shadow-md');
+                }
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            if(tabId === 'dashboard') renderDashboard();
+            if(tabId === 'inbox') renderInbox();
+            if(tabId === 'review') renderReview();
+        }
+
+        window.getAppState = () => { return appState; };
+        window.applyStateFromCloud = (data) => {
+            if(data) { appState = data; }
+            saveState(true); showToast("Data disinkronkan dari Cloud.");
+        };
+
+        function saveState(skipCloud = false) {
+            localStorage.setItem('fef_v5_tasks', JSON.stringify(appState.tasks));
+            localStorage.setItem('fef_v5_stats', JSON.stringify(appState.stats));
+            if(!skipCloud && typeof window.saveDataToCloud === 'function') { window.saveDataToCloud(appState); }
+            updateNavScore();
+        }
+
+        function loadLocalState() {
+            const localData = localStorage.getItem('fef_v5_tasks');
+            if (localData) appState.tasks = JSON.parse(localData);
+            const localStats = localStorage.getItem('fef_v5_stats');
+            if (localStats) appState.stats = JSON.parse(localStats);
+        }
+
+        let isLoginMode = true;
+        function updateProfileUI() {
+            const u = window.currentUser;
+            const emailDisp = document.getElementById('user-email-display');
+            const statusText = document.getElementById('cloud-status-text');
+            const statusDot = document.getElementById('cloud-indicator-dot');
+            const btn = document.getElementById('btn-auth-action');
+
+            if(u && !u.isAnonymous) {
+                emailDisp.innerText = u.email;
+                statusText.innerText = "Cloud Auto-Sync"; statusDot.className = "flex h-2 w-2 rounded-full bg-emerald-500";
+                btn.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Keluar Akun';
+                btn.className = "relative z-10 w-full py-2.5 bg-white border border-red-200 text-red-500 text-xs font-bold rounded-xl hover:bg-red-50 transition-all shadow-sm";
+                btn.onclick = () => { window.FEF_Logout(); };
+            } else {
+                emailDisp.innerText = "Akun Tamu (Offline)";
+                statusText.innerText = "Menunggu Sinkronisasi"; statusDot.className = "flex h-2 w-2 rounded-full bg-amber-400";
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Amankan ke Cloud';
+                btn.className = "relative z-10 w-full py-2.5 bg-slate-900 border border-slate-900 text-white text-xs font-bold rounded-xl hover:bg-primary transition-all shadow-sm";
+                btn.onclick = () => { openAuthModal(); };
+            }
+        }
+
+        function openAuthModal() { document.getElementById('modal-auth').classList.remove('hidden'); document.getElementById('modal-auth').classList.add('flex'); }
+        function closeAuthModal() { document.getElementById('modal-auth').classList.add('hidden'); document.getElementById('modal-auth').classList.remove('flex'); }
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? 'Masuk Akun' : 'Buat Akun';
+            document.getElementById('auth-submit-btn').innerText = isLoginMode ? 'Masuk & Sinkronisasi' : 'Daftar & Amankan Data';
+            document.getElementById('auth-toggle-text').innerText = isLoginMode ? 'Belum punya akun?' : 'Sudah punya akun?';
+            document.getElementById('auth-toggle-btn').innerText = isLoginMode ? 'Daftar' : 'Masuk';
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('auth-submit-btn'); const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...'; btn.disabled = true;
+            try {
+                if(isLoginMode) { await window.FEF_Login(document.getElementById('auth-email').value, document.getElementById('auth-password').value); showToast("Berhasil masuk!"); } 
+                else { await window.FEF_Register(document.getElementById('auth-email').value, document.getElementById('auth-password').value); showToast("Akun berhasil dibuat!"); }
+                closeAuthModal();
+            } catch(err) { showToast("Terjadi kesalahan atau kredensial salah.", 'error'); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+
+        function generateId() { return 'task_' + Date.now().toString(36) + Math.random().toString(36).substring(2); }
+        function calculatePriority(urgency, impact, size) { return (parseInt(urgency) * 3) + (parseInt(impact) * 2) + (4 - parseInt(size)); }
+
+        function getBadgeHtml(score) {
+            if (score >= 10) return `<span class="bg-red-50 text-red-600 border border-red-200 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm"><i class="fa-solid fa-fire text-red-500"></i> 🔥 Prioritas Utama</span>`;
+            if (score >= 7) return `<span class="bg-blue-50 text-blue-600 border border-blue-200 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm"><i class="fa-solid fa-bolt text-blue-500"></i> ⚡ Menengah</span>`;
+            return `<span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm"><i class="fa-solid fa-mug-hot text-slate-500"></i> ☕ Santai</span>`;
+        }
+
+        function updateNavScore() {
+            // TIDAK ADA PENALTI UNTUK DISTRAKSI YANG DIPARKIR
+            const score = (appState.stats.sessions * 10) + (appState.stats.completed * 15);
+            document.getElementById('nav-focus-score').innerText = score;
+            document.getElementById('stat-score').innerText = score;
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const titleInput = document.getElementById('task-title');
+            const descInput = document.getElementById('task-desc');
+            const deadlineInput = document.getElementById('task-deadline');
+            const title = titleInput.value.trim();
+            if(!title) return;
+
+            let urgency = 1;
+            if(deadlineInput.value) {
+                const diffHours = (new Date(deadlineInput.value).getTime() - new Date().getTime()) / (1000 * 60 * 60);
+                urgency = diffHours <= 24 ? 3 : (diffHours <= 72 ? 2 : 1);
+            } else { urgency = 2; }
+
+            const impact = document.querySelector('input[name="impact"]:checked').value;
+            const size = document.querySelector('input[name="size"]:checked').value;
+
+            if (appState.editingTaskId) {
+                const task = appState.tasks.find(t => t.id === appState.editingTaskId);
+                if(task) { Object.assign(task, {title, desc: descInput.value.trim(), deadline: deadlineInput.value, impact, size, score: calculatePriority(urgency, impact, size)}); }
+                appState.editingTaskId = null;
+                resetFormUI(); showToast("Perubahan tugas berhasil disimpan.");
+            } else {
+                appState.tasks.push({ id: generateId(), title, desc: descInput.value.trim(), deadline: deadlineInput.value, impact, size, score: calculatePriority(urgency, impact, size), status: 'inbox', subtasks: [], createdAt: Date.now() });
+                showToast("Tugas ditambahkan ke Inbox.");
+            }
+            saveState(); e.target.reset(); renderInbox();
+        }
+
+        function editTask(id) {
+            if(event) event.stopPropagation();
+            const task = appState.tasks.find(t => t.id === id);
+            if (!task) return;
+            document.getElementById('task-title').value = task.title;
+            document.getElementById('task-desc').value = task.desc || '';
+            document.getElementById('task-deadline').value = task.deadline || '';
+            if(task.impact) document.querySelector(`input[name="impact"][value="${task.impact}"]`).checked = true;
+            if(task.size) document.querySelector(`input[name="size"][value="${task.size}"]`).checked = true;
+            appState.editingTaskId = id;
+            
+            const btn = document.getElementById('btn-submit-task');
+            btn.innerHTML = '<i class="fa-solid fa-save mr-2"></i> Simpan Koreksi';
+            btn.classList.replace('bg-slate-900', 'bg-primary');
+            document.getElementById('view-inbox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function resetFormUI() {
+            const btn = document.getElementById('btn-submit-task');
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Masukkan';
+            btn.classList.replace('bg-primary', 'bg-slate-900');
+        }
+
+        function deleteTask(id) {
+            if(event) event.stopPropagation();
+            appState.tasks = appState.tasks.filter(t => t.id !== id);
+            saveState(); renderInbox(); renderDashboard(); showToast("Tugas dihapus.", "info");
+        }
+
+        function getSortedInbox() { return appState.tasks.filter(t => t.status === 'inbox').sort((a, b) => b.score - a.score || b.createdAt - a.createdAt); }
+
+        let currentModalTaskId = null;
+        function openTaskModal(taskId) {
+            currentModalTaskId = taskId;
+            const task = appState.tasks.find(t => t.id === taskId);
+            if(!task) return;
+
+            document.getElementById('modal-task-title').innerText = task.title;
+            let badgesHtml = getBadgeHtml(task.score);
+            if(task.deadline) {
+                const isLate = new Date(task.deadline).getTime() < new Date().getTime();
+                const color = isLate ? 'red' : 'amber';
+                badgesHtml += `<span class="bg-${color}-50 text-${color}-600 border border-${color}-200 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm"><i class="fa-regular fa-clock"></i> ${new Date(task.deadline).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</span>`;
+            }
+            document.getElementById('modal-badge-container').innerHTML = badgesHtml;
+
+            const descEl = document.getElementById('modal-task-desc');
+            if (task.desc && task.desc.trim() !== '') { descEl.innerText = task.desc; descEl.classList.remove('hidden'); }
+            else { descEl.classList.add('hidden'); }
+
+            renderModalSubtasks();
+
+            document.getElementById('modal-btn-edit').onclick = () => { closeTaskModal(); editTask(taskId); switchTab('inbox'); };
+            document.getElementById('modal-btn-start').onclick = () => { closeTaskModal(); switchTab('dashboard'); startFocus(taskId); };
+
+            const input = document.getElementById('modal-input-subtask');
+            input.value = ''; input.onkeypress = (e) => { if(e.key === 'Enter') { e.preventDefault(); addModalSubtask(); } };
+            document.getElementById('modal-btn-add-subtask').onclick = addModalSubtask;
+
+            document.getElementById('modal-task-detail').classList.add('modal-active');
+        }
+
+        function closeTaskModal() { document.getElementById('modal-task-detail').classList.remove('modal-active'); currentModalTaskId = null; }
+
+        function renderModalSubtasks() {
+            if(!currentModalTaskId) return;
+            const task = appState.tasks.find(t => t.id === currentModalTaskId);
+            const list = document.getElementById('modal-subtask-list');
+            if(task && task.subtasks && task.subtasks.length > 0) {
+                list.innerHTML = task.subtasks.map((st, i) => `
+                    <div class="flex items-center gap-3 p-3.5 bg-white border border-slate-200/60 rounded-xl shadow-sm hover:border-primary/40 transition-all group">
+                        <input type="checkbox" ${st.done ? 'checked' : ''} onchange="toggleModalSubtask(${i})" class="w-4 h-4 rounded text-primary focus:ring-primary/50 cursor-pointer">
+                        <span class="${st.done ? 'line-through text-slate-400' : 'text-slate-700 font-medium'} text-sm leading-tight flex-1">${st.title}</span>
+                        <button onclick="deleteModalSubtask(${i})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `).join('');
+            } else { list.innerHTML = `<div class="text-center p-6 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50"><p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Belum ada langkah (Breakdown)</p></div>`; }
+        }
+
+        function addModalSubtask() {
+            const val = document.getElementById('modal-input-subtask').value.trim();
+            if(!val || !currentModalTaskId) return;
+            const task = appState.tasks.find(t => t.id === currentModalTaskId);
+            if(task) {
+                if(!task.subtasks) task.subtasks = [];
+                task.subtasks.push({ title: val, done: false });
+                saveState(); renderModalSubtasks(); renderInbox(); renderDashboard();
+                document.getElementById('modal-input-subtask').value = '';
+            }
+        }
+
+        function toggleModalSubtask(i) {
+            const task = appState.tasks.find(t => t.id === currentModalTaskId);
+            if(task && task.subtasks) { task.subtasks[i].done = !task.subtasks[i].done; saveState(); renderModalSubtasks(); renderInbox(); renderDashboard();}
+        }
+
+        function deleteModalSubtask(i) {
+            const task = appState.tasks.find(t => t.id === currentModalTaskId);
+            if(task && task.subtasks) { task.subtasks.splice(i, 1); saveState(); renderModalSubtasks(); renderInbox(); renderDashboard();}
+        }
+
+        function renderInbox() {
+            const list = document.getElementById('inbox-list'); list.innerHTML = '';
+            const inboxTasks = getSortedInbox();
+            if(inboxTasks.length === 0) { list.innerHTML = `<div class="border border-dashed border-slate-200 rounded-[24px] p-12 text-center bg-white shadow-sm"><div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto text-3xl mb-4"><i class="fa-solid fa-mug-hot"></i></div><p class="text-slate-500 font-medium">Semua tugas beres. Inbox kosong.</p></div>`; return; }
+
+            inboxTasks.forEach(task => {
+                const stTotal = task.subtasks ? task.subtasks.length : 0;
+                const stDone = task.subtasks ? task.subtasks.filter(s => s.done).length : 0;
+                const stBadge = stTotal > 0 ? `<span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 border border-indigo-100 shadow-sm"><i class="fa-solid fa-list-check"></i> ${stDone}/${stTotal}</span>` : '';
+
+                list.innerHTML += `
+                    <div class="task-card bg-white border border-slate-200/60 p-5 rounded-2xl shadow-sm cursor-pointer group" onclick="openTaskModal('${task.id}')">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-4">
+                                <h4 class="font-bold text-slate-900 group-hover:text-primary transition-colors text-lg tracking-tight">${task.title}</h4>
+                                <div class="flex flex-wrap gap-2 mt-3 items-center">
+                                    ${getBadgeHtml(task.score)}
+                                    ${stBadge}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
+                                <button onclick="editTask('${task.id}')" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all flex items-center justify-center"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="deleteTask('${task.id}')" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all flex items-center justify-center"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderDashboard() {
+            const targetContainer = document.getElementById('dashboard-target-container');
+            const queueContainer = document.getElementById('dashboard-queue-container');
+            
+            if(appState.activeTaskId) {
+                const activeTask = appState.tasks.find(t => t.id === appState.activeTaskId);
+                if(activeTask) {
+                    targetContainer.innerHTML = `
+                        <div class="bg-gradient-to-br from-amber-400 to-amber-600 rounded-[32px] p-10 md:p-12 shadow-xl relative overflow-hidden">
+                            <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                            <div class="relative z-10">
+                                <div class="inline-flex bg-black/10 backdrop-blur text-white text-[10px] font-bold px-3 py-1.5 rounded-lg mb-5 uppercase tracking-widest border border-white/20"><i class="fa-solid fa-pause mr-1.5"></i> Sesi Di-jeda (Minimized)</div>
+                                <h3 class="text-3xl md:text-5xl font-black text-white ${activeTask.desc ? 'mb-4' : 'mb-10'} max-w-3xl leading-tight tracking-tight drop-shadow-md">${activeTask.title}</h3>
+                                ${activeTask.desc ? `<p class="text-amber-50 mb-10 max-w-2xl text-sm leading-relaxed font-medium bg-black/10 p-4 rounded-2xl border border-white/10">${activeTask.desc}</p>` : ''}
+                                <div class="flex flex-wrap gap-4">
+                                    <button onclick="resumeFocus()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 shadow-xl shadow-slate-900/20 flex items-center gap-3 transition-all scale-100 hover:scale-105 active:scale-95"><i class="fa-solid fa-expand text-accent"></i> Lanjut Fokus</button>
+                                    <button onclick="cancelFocus()" class="bg-white/20 text-white px-6 py-4 rounded-2xl font-bold hover:bg-white/30 backdrop-blur-sm border border-white/20 transition-colors">Batalkan Sesi</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    queueContainer.classList.add('hidden'); return;
+                }
+            }
+
+            const inboxTasks = getSortedInbox();
+            if(inboxTasks.length === 0) {
+                targetContainer.innerHTML = `<div class="bg-white border border-slate-200/60 rounded-[32px] p-12 text-center shadow-soft"><div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto text-4xl mb-5 shadow-inner"><i class="fa-solid fa-trophy"></i></div><h3 class="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Semua Pekerjaan Rampung!</h3><p class="text-slate-500 font-medium mb-8">Tambahkan tugas baru untuk mulai fokus kembali.</p><button onclick="switchTab('inbox')" class="bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-primary transition-all shadow-md">Buka Inbox</button></div>`;
+                queueContainer.classList.add('hidden'); return;
+            }
+
+            const topTask = inboxTasks[0];
+            let subtaskHtml = '';
+            if(topTask.subtasks && topTask.subtasks.length > 0) {
+                const pending = topTask.subtasks.filter(s => !s.done);
+                if(pending.length > 0) {
+                    subtaskHtml = `<div class="mt-6 mb-8 bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10 max-w-2xl">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2.5">Langkah Selanjutnya (Breakdown):</p>
+                        <p class="text-white text-sm font-medium flex items-center"><i class="fa-regular fa-circle mr-3 opacity-50"></i>${pending[0].title}</p>
+                    </div>`;
+                }
+            }
+
+            targetContainer.innerHTML = `
+                <div class="glass-gradient rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="inline-flex bg-primary/20 backdrop-blur text-primary-200 text-primary text-[10px] font-bold px-3 py-1.5 rounded-lg mb-5 uppercase tracking-widest border border-primary/30"><i class="fa-solid fa-bullseye mr-1.5"></i> Target Eksekusi Utama</div>
+                        <h3 class="text-3xl md:text-5xl font-black text-white ${topTask.desc || subtaskHtml ? 'mb-4' : 'mb-10'} max-w-3xl leading-tight tracking-tight drop-shadow-md">${topTask.title}</h3>
+                        ${topTask.desc ? `<p class="text-slate-300 mb-2 max-w-2xl text-sm leading-relaxed font-medium">${topTask.desc}</p>` : ''}
+                        ${subtaskHtml}
+                        <div class="flex flex-wrap items-center gap-4 ${subtaskHtml ? '' : 'mt-8'}">
+                            <button onclick="startFocus('${topTask.id}')" class="bg-primary text-white px-8 py-4 rounded-2xl font-bold hover:bg-primaryHover shadow-glow flex items-center gap-3 text-lg transition-all scale-100 hover:scale-105 active:scale-95"><i class="fa-solid fa-play text-accent"></i> Mulai Fokus</button>
+                            <button onclick="openTaskModal('${topTask.id}')" class="bg-white/10 text-white px-6 py-4 rounded-2xl font-bold hover:bg-white/20 backdrop-blur-sm transition-colors border border-white/10"><i class="fa-solid fa-expand"></i> Detail Lengkap</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let timerInterval; let timeLeft = 25 * 60; let isRunning = false;
+        
+        function requestNotificationPermission() { if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") Notification.requestPermission(); }
+
+        function startFocus(taskId) {
+            requestNotificationPermission();
+            appState.activeTaskId = taskId;
+            const task = appState.tasks.find(t => t.id === taskId);
+            document.getElementById('focus-title-display').innerText = task.title;
+            document.getElementById('focus-desc-display').innerText = task.desc || '';
+            
+            const overlay = document.getElementById('overlay-focus');
+            overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 50);
+            document.getElementById('mini-timer').classList.add('hidden');
+            
+            resetTimer(); 
+        }
+
+        function resumeFocus() {
+            const overlay = document.getElementById('overlay-focus');
+            overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 50);
+            document.getElementById('mini-timer').classList.add('hidden'); updateTimerDisplay();
+        }
+
+        function minimizeFocus() {
+            const overlay = document.getElementById('overlay-focus');
+            overlay.classList.add('opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 500);
+            
+            const miniTimer = document.getElementById('mini-timer');
+            miniTimer.classList.remove('hidden'); setTimeout(() => miniTimer.classList.remove('translate-y-20', 'opacity-0'), 50);
+            if (appState.activeTaskId) document.getElementById('mini-timer-title').innerText = appState.tasks.find(t => t.id === appState.activeTaskId)?.title || "Aktif";
+
+            renderDashboard(); showToast(isRunning ? "Sesi berjalan di latar." : "Sesi di-jeda.", "success");
+        }
+
+        function cancelFocus() {
+            if(confirm("Yakin membatalkan sesi ini?")) {
+                pauseTimer(); appState.activeTaskId = null;
+                document.getElementById('mini-timer').classList.add('hidden');
+                renderDashboard(); showToast("Sesi dibatalkan.");
+            }
+        }
+
+        function adjustTimer(minutes) {
+            if(isRunning) { showToast("Jeda (Pause) dulu untuk ubah waktu.", "error"); return; }
+            timeLeft += minutes * 60; if(timeLeft < 60) timeLeft = 60; updateTimerDisplay();
+        }
+
+        function formatTime(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
+        function updateTimerDisplay() {
+            const fTime = formatTime(timeLeft);
+            document.getElementById('timer-display').innerText = fTime;
+            document.getElementById('mini-timer-display').innerText = fTime;
+            if(isRunning) document.title = `(${fTime}) FEF Focus`;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('btn-timer-action');
+            if(isRunning) {
+                pauseTimer();
+                btn.innerHTML = 'Lanjutkan'; btn.classList.replace('bg-amber-500', 'bg-primary'); btn.classList.replace('shadow-amber-500/40', 'shadow-glow');
+            } else {
+                timerInterval = setInterval(() => {
+                    timeLeft--; updateTimerDisplay();
+                    if(timeLeft <= 0) { pauseTimer(); playAlarm(); finishSession(); }
+                }, 1000);
+                isRunning = true;
+                btn.innerHTML = 'Jeda'; btn.classList.replace('bg-primary', 'bg-amber-500'); btn.classList.replace('shadow-glow', 'shadow-amber-500/40');
+            }
+        }
+
+        function pauseTimer() { clearInterval(timerInterval); isRunning = false; document.title = "Focus Execute Finish"; }
+        function resetTimer() {
+            pauseTimer(); timeLeft = 25 * 60; updateTimerDisplay();
+            const btn = document.getElementById('btn-timer-action');
+            btn.innerHTML = "Mulai"; btn.className = "bg-primary text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-primaryHover transition-all shadow-glow min-w-[220px] scale-100 hover:scale-105 active:scale-95";
+        }
+
+        function playAlarm() { if ("Notification" in window && Notification.permission === "granted") new Notification("🎯 Waktu Habis!", { body: "Sesi selesai. Cek hasil pekerjaan Anda." }); }
+
+        function parkFromFocus() {
+            const input = document.getElementById('focus-park-input'); const val = input.value.trim();
+            if(!val) return;
+            appState.tasks.push({ id: generateId(), title: val, status: 'parking', score: 0, createdAt: Date.now() });
+            appState.stats.distractions++; saveState(); input.value = '';
+            showToast("Diparkir! Lanjut fokus.");
+        }
+        document.getElementById('focus-park-input').addEventListener('keypress', function(e) { if(e.key === 'Enter') parkFromFocus(); });
+
+        function finishSession() {
+            pauseTimer();
+            const overlay = document.getElementById('overlay-focus');
+            overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            document.getElementById('modal-finish').classList.remove('hidden');
+        }
+
+        function processFinish(finalStatus) {
+            const task = appState.tasks.find(t => t.id === appState.activeTaskId);
+            if(task) task.status = finalStatus;
+            appState.stats.sessions++; if(finalStatus === 'completed') appState.stats.completed++;
+            saveState();
+            
+            document.getElementById('modal-finish').classList.add('hidden'); appState.activeTaskId = null;
+            document.getElementById('overlay-focus').classList.add('hidden'); document.getElementById('mini-timer').classList.add('hidden');
+            renderDashboard(); showToast("Progres dicatat.");
+        }
+
+        function renderReview() {
+            document.getElementById('stat-sessions').innerText = appState.stats.sessions;
+            document.getElementById('stat-completed').innerText = appState.stats.completed;
+            document.getElementById('stat-distractions').innerText = appState.stats.distractions;
+            
+            const completedList = document.getElementById('completed-list'); const parkingList = document.getElementById('parking-list');
+            completedList.innerHTML = ''; parkingList.innerHTML = '';
+
+            const completedTasks = appState.tasks.filter(t => t.status === 'completed');
+            if(completedTasks.length === 0) completedList.innerHTML = '<p class="text-sm text-slate-400 italic font-medium mt-4">Belum ada pekerjaan rampung.</p>';
+            else completedTasks.forEach(t => completedList.innerHTML += `<div class="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-slate-100 shadow-sm"><i class="fa-solid fa-circle-check text-emerald-500"></i><span class="text-sm font-semibold text-slate-700 line-through">${t.title}</span></div>`);
+
+            const parkedTasks = appState.tasks.filter(t => t.status === 'parking');
+            if(parkedTasks.length === 0) parkingList.innerHTML = '<p class="text-sm text-amber-600/50 italic font-medium mt-4">Area parkir kosong.</p>';
+            else parkedTasks.forEach(t => parkingList.innerHTML += `<div class="flex items-center justify-between p-3.5 bg-white rounded-xl border border-amber-100 shadow-sm"><span class="text-sm font-semibold text-amber-900">${t.title}</span><button onclick="unparkTask('${t.id}')" class="text-[10px] font-bold uppercase tracking-widest bg-amber-100 text-amber-700 px-3 py-2 rounded-lg hover:bg-amber-200 transition-colors">Pindah ke Inbox</button></div>`);
+        }
+
+        function unparkTask(id) {
+            const task = appState.tasks.find(t => t.id === id);
+            if(task) { task.status = 'inbox'; task.score = calculatePriority(2, 2, 2); task.createdAt = Date.now(); }
+            saveState(); renderReview(); showToast("Tugas dipindah ke Inbox");
+        }
+
+        window.onload = async () => { loadLocalState(); updateNavScore(); switchTab('dashboard'); updateProfileUI(); };
+    </script>
+</body>
+</html>
