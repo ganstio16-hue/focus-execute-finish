@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Focus Execute Finish (Local Mode)</title>
+    <title>Focus Execute Finish</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
@@ -25,7 +25,7 @@
     <canvas id="pip-canvas" width="180" height="96" class="hidden"></canvas>
     <video id="pip-video" class="hidden" muted playsinline></video>
 
-    <!-- FLOATING TIMER -->
+    <!-- FLOATING TIMER WIDGET -->
     <div id="floating-timer" class="fixed bottom-20 md:bottom-8 right-4 bg-slate-900 border border-indigo-500 rounded-xl p-3 shadow-2xl shadow-indigo-500/20 z-[60] hidden flex-row items-center gap-3 cursor-pointer hover:bg-slate-800 transition-colors group" onclick="reopenFocusMode()">
         <div class="relative w-8 h-8 flex items-center justify-center">
             <i id="floating-timer-icon" class="fa-solid fa-circle-notch animate-spin text-indigo-400 absolute text-2xl"></i>
@@ -40,7 +40,7 @@
         </div>
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR DESKTOP -->
     <aside class="w-64 bg-slate-900 border-r border-slate-800 hidden md:flex flex-col z-20 shadow-2xl relative shrink-0">
         <div class="p-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 shrink-0">
@@ -90,7 +90,7 @@
         </button>
     </nav>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN CONTENT AREA -->
     <main class="flex-1 flex flex-col relative overflow-hidden pb-16 md:pb-0 w-full max-w-full">
         <header class="h-16 border-b border-slate-800 flex items-center justify-between px-4 md:px-8 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10 w-full max-w-full">
             <div class="flex items-center gap-3">
@@ -133,7 +133,7 @@
                 <div id="inbox-list" class="space-y-3 pb-10 w-full"></div>
             </div>
 
-            <!-- TASKS TAB (PEMISAHAN STATUS) -->
+            <!-- TASKS TAB -->
             <div id="tab-tasks" class="tab-content hidden max-w-3xl mx-auto space-y-8 w-full">
                 <div class="w-full">
                     <h3 class="text-sm font-medium text-indigo-400 mb-3 uppercase tracking-wider border-b border-slate-800 pb-2"><i class="fa-solid fa-bolt mr-2"></i>Sedang Berjalan</h3>
@@ -188,7 +188,10 @@
     <div id="modal-detail" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh]">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/30 shrink-0">
-                <h3 class="font-medium text-white text-lg">Detail Tugas Lengkap</h3>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-medium text-white text-lg">Detail Tugas Lengkap</h3>
+                    <span id="detail-created-at" class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700"></span>
+                </div>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
@@ -199,7 +202,13 @@
 
                 <div>
                     <label class="text-xs text-slate-400 font-medium mb-2 block uppercase tracking-wider"><i class="fa-solid fa-align-left mr-1"></i> Deskripsi / Catatan Khusus</label>
-                    <textarea id="detail-notes" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500 resize-none" placeholder="Tulis rincian tugas, tempelkan link referensi, atau catatan apapun di sini..."></textarea>
+                    <textarea id="detail-notes" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500 resize-none" placeholder="Tulis rincian tugas, tempelkan link referensi, atau catatan umum di sini..."></textarea>
+                </div>
+
+                <!-- RIWAYAT CATATAN LANJUT NANTI (TERPISAH) -->
+                <div id="continue-notes-container" class="hidden bg-indigo-950/30 p-4 rounded-xl border border-indigo-800/40 space-y-2">
+                    <label class="text-xs font-semibold text-indigo-300 uppercase tracking-wider block"><i class="fa-solid fa-bookmark mr-1"></i> Riwayat Catatan Lanjutan (Lanjut Nanti)</label>
+                    <div id="continue-notes-list" class="space-y-2 max-h-36 overflow-y-auto pr-1"></div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 bg-slate-950/50 p-4 rounded-xl border border-slate-800">
@@ -229,7 +238,7 @@
                 <div>
                     <label class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2 block"><i class="fa-solid fa-list-check mr-1"></i> Pecah ke Langkah Konkret (Subtugas)</label>
                     <div class="flex flex-col md:flex-row gap-2 mb-3">
-                        <input type="text" id="subtask-input" placeholder="Apa langkah pertama yang harus dilakukan?" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none">
+                        <input type="text" id="subtask-input" placeholder="Apa langkah pertama yang harus dilakukan?" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none" onkeypress="if(event.key==='Enter') addSubtask('detail')">
                         <button onclick="addSubtask('detail')" class="w-full md:w-auto shrink-0 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"><i class="fa-solid fa-plus mr-1"></i> Tambah</button>
                     </div>
                     <div id="subtask-list" class="space-y-2 mt-3"></div>
@@ -248,6 +257,21 @@
                         <i class="fa-solid fa-play text-xs"></i> Mulai Eksekusi
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI CHECK/UNCHECK SUBTUGAS (Anti-Kepencet) -->
+    <div id="modal-subtask-confirm" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[120] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl flex flex-col text-center">
+            <div class="w-12 h-12 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Konfirmasi Langkah</h3>
+            <p id="subtask-confirm-text" class="text-xs text-slate-300 mb-5 leading-relaxed px-2">Apakah Anda yakin ingin mengubah status langkah ini?</p>
+            <div class="flex gap-3">
+                <button onclick="closeSubtaskConfirmModal()" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium border border-slate-700 transition-colors">Batal</button>
+                <button id="btn-subtask-confirm-submit" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium shadow-lg transition-colors">Ya, Ubah</button>
             </div>
         </div>
     </div>
@@ -321,7 +345,7 @@
                     <button onclick="openAddSubtaskFocusPrompt()" class="text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-950/60 border border-indigo-800/60 px-2.5 py-1 rounded-lg transition-colors"><i class="fa-solid fa-plus mr-1"></i>Tambah</button>
                 </div>
                 <div id="focus-subtask-add-box" class="hidden flex gap-2 mb-3">
-                    <input type="text" id="focus-subtask-quick-input" placeholder="Langkah kecil baru..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none">
+                    <input type="text" id="focus-subtask-quick-input" placeholder="Langkah kecil baru..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none" onkeypress="if(event.key==='Enter') addSubtask('focus')">
                     <button onclick="addSubtask('focus')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium shrink-0">Simpan</button>
                 </div>
                 <div id="focus-subtasks-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
@@ -338,11 +362,10 @@
         </div>
     </div>
 
-    <!-- MODAL FINISH (DENGAN TOMBOL CLOSE) -->
+    <!-- MODAL FINISH -->
     <div id="modal-finish" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[110] hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-5 md:p-6 shadow-2xl flex flex-col relative" id="modal-finish-content">
             
-            <!-- TOMBOL CLOSE (X) -->
             <button onclick="closeFinishModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 transition-colors" title="Batal / Kembali">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -361,8 +384,8 @@
 
             <div id="continue-options" class="hidden space-y-4 bg-slate-950 p-4 rounded-xl border border-slate-800 mb-2 w-full box-border">
                 <div>
-                    <label class="text-xs text-slate-400 block mb-2">Catatan: Nanti lanjut dari mana?</label>
-                    <input type="text" id="continue-notes" placeholder="Misal: Lanjut kerjain bagian akhir..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
+                    <label class="text-xs text-indigo-300 font-medium block mb-2"><i class="fa-solid fa-pen-to-square mr-1"></i> Catatan Lanjutan: Nanti lanjut dari mana?</label>
+                    <input type="text" id="continue-notes" placeholder="Misal: Lanjut kerjain bagian akhir..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                 </div>
                 <button onclick="submitFinish('continue')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-sm font-medium transition-colors">Simpan Progress & Jeda</button>
             </div>
@@ -370,6 +393,14 @@
     </div>
 
     <script>
+        // Helper untuk memformat waktu secara presisi
+        function getFormattedTime() {
+            const now = new Date();
+            const hrs = now.getHours().toString().padStart(2, '0');
+            const mins = now.getMinutes().toString().padStart(2, '0');
+            return `Jam ${hrs}:${mins}`;
+        }
+
         let appState = {
             tasks: JSON.parse(localStorage.getItem('fef_tasks')) || [],
             stats: JSON.parse(localStorage.getItem('fef_stats')) || { sessions: 0, completed: 0, parked: 0 },
@@ -411,10 +442,12 @@
             let name = input.value.trim();
             if (!name) { name = "Tugas Baru"; }
             
+            const timeStamp = getFormattedTime();
             const newTask = {
                 id: Date.now().toString(),
                 name: name, impact: 0, risk: 0, deadline: null, notes: "",
-                subtasks: [], completed: false, isReady: true, status: 'todo'
+                subtasks: [], continueNotes: [], completed: false, isReady: true, status: 'todo',
+                createdAt: timeStamp
             };
             appState.tasks.push(newTask);
             saveState();
@@ -433,8 +466,10 @@
             document.getElementById('detail-impact').value = task.impact || 0;
             document.getElementById('detail-risk').value = task.risk || 0;
             document.getElementById('detail-deadline').value = task.deadline || '';
+            document.getElementById('detail-created-at').innerText = task.createdAt ? `Dibuat ${task.createdAt}` : '';
             
             renderSubtasks();
+            renderContinueNotesList();
             document.getElementById('modal-detail').classList.remove('hidden');
             
             if(task.name === "Tugas Baru") {
@@ -466,7 +501,8 @@
             if(!name || !currentEditingId) return;
             
             const task = appState.tasks.find(t => t.id === currentEditingId);
-            task.subtasks.push({ id: Date.now().toString(), name, completed: false, note: "" });
+            const timeStamp = getFormattedTime();
+            task.subtasks.push({ id: Date.now().toString(), name, completed: false, note: "", createdAt: timeStamp });
             
             saveState();
             input.value = '';
@@ -479,16 +515,44 @@
             }
         }
 
-        function toggleSubtask(subId) {
+        // KONFIRMASI KE-CEKLIS / BATAL CEKLIS SUBTUGAS (Anti-Kepencet)
+        let pendingSubtaskToggle = null;
+
+        function promptSubtaskToggle(subId) {
             const task = appState.tasks.find(t => t.id === currentEditingId);
             if(!task) return;
             const sub = task.subtasks.find(s => s.id === subId);
-            if(sub) { 
-                sub.completed = !sub.completed; 
-                renderSubtasks(); 
-                renderFocusSubtasks();
+            if(!sub) return;
+
+            pendingSubtaskToggle = { subId: sub.id, targetState: !sub.completed };
+            
+            const confirmText = sub.completed 
+                ? `Apakah Anda yakin ingin membatalkan status selesai pada langkah "${sub.name}"?`
+                : `Apakah Anda yakin ingin menandai langkah "${sub.name}" sebagai selesai?`;
+                
+            document.getElementById('subtask-confirm-text').innerText = confirmText;
+            document.getElementById('btn-subtask-confirm-submit').onclick = executeSubtaskToggle;
+            document.getElementById('modal-subtask-confirm').classList.remove('hidden');
+        }
+
+        function closeSubtaskConfirmModal() {
+            document.getElementById('modal-subtask-confirm').classList.add('hidden');
+            pendingSubtaskToggle = null;
+        }
+
+        function executeSubtaskToggle() {
+            if(!pendingSubtaskToggle || !currentEditingId) return;
+            const task = appState.tasks.find(t => t.id === currentEditingId);
+            if(!task) return;
+            const sub = task.subtasks.find(s => s.id === pendingSubtaskToggle.subId);
+            
+            if(sub) {
+                sub.completed = pendingSubtaskToggle.targetState;
                 saveState();
+                renderSubtasks();
+                renderFocusSubtasks();
             }
+            closeSubtaskConfirmModal();
         }
 
         function toggleSubtaskNoteInput(subId) {
@@ -525,11 +589,12 @@
             container.innerHTML = task.subtasks.map(sub => `
                 <div class="p-2.5 bg-slate-950/50 rounded-xl border border-slate-800/80 w-full space-y-2">
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-3 cursor-pointer flex-1" onclick="toggleSubtask('${sub.id}')">
+                        <div class="flex items-center gap-3 cursor-pointer flex-1" onclick="promptSubtaskToggle('${sub.id}')">
                             <div class="w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${sub.completed ? 'bg-indigo-500 border-indigo-500' : 'border-slate-500'}">
                                 ${sub.completed ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
                             </div>
                             <span class="text-sm overflow-hidden text-ellipsis ${sub.completed ? 'line-through text-slate-500' : 'text-slate-300'}">${sub.name}</span>
+                            ${sub.createdAt ? `<span class="text-[9px] text-slate-500 shrink-0">(${sub.createdAt})</span>` : ''}
                         </div>
                         <button onclick="toggleSubtaskNoteInput('${sub.id}')" title="Catatan Subtugas" class="text-xs text-slate-400 hover:text-indigo-300 bg-slate-900 border border-slate-800 px-2 py-1 rounded-md transition-colors">
                             <i class="fa-regular fa-note-sticky mr-1"></i>Catatan
@@ -540,7 +605,7 @@
                     </div>
                     ${sub.note ? `<div class="text-xs text-indigo-300/90 bg-slate-900/90 p-2 rounded-lg border border-indigo-900/40 ml-8 flex items-start gap-2"><i class="fa-regular fa-comment-dots text-indigo-400 mt-0.5 shrink-0"></i><span class="break-words flex-1">${sub.note}</span></div>` : ''}
                     <div id="subnote-input-${sub.id}" class="hidden flex gap-2 ml-8 pt-1">
-                        <input type="text" id="subnote-val-${sub.id}" value="${sub.note || ''}" placeholder="Tulis catatan khusus subtugas ini..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="subnote-val-${sub.id}" value="${sub.note || ''}" placeholder="Tulis catatan khusus langkah ini..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
                         <button onclick="saveSubtaskNote('${sub.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium shrink-0">Simpan</button>
                     </div>
                 </div>
@@ -549,7 +614,6 @@
 
         function renderFocusSubtasks() {
             const task = appState.tasks.find(t => t.id === currentEditingId);
-            const container = document.getElementById('focus-subtasks-container');
             const list = document.getElementById('focus-subtasks-list');
 
             if (!task) return;
@@ -562,7 +626,7 @@
             list.innerHTML = task.subtasks.map(sub => `
                 <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80 w-full space-y-2">
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-3 cursor-pointer flex-1" onclick="toggleSubtask('${sub.id}')">
+                        <div class="flex items-center gap-3 cursor-pointer flex-1" onclick="promptSubtaskToggle('${sub.id}')">
                             <div class="w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${sub.completed ? 'bg-indigo-500 border-indigo-500' : 'border-slate-500'}">
                                 ${sub.completed ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
                             </div>
@@ -600,6 +664,25 @@
                 saveState();
                 renderFocusSubtasks();
             }
+        }
+
+        function renderContinueNotesList() {
+            const task = appState.tasks.find(t => t.id === currentEditingId);
+            const container = document.getElementById('continue-notes-container');
+            const list = document.getElementById('continue-notes-list');
+
+            if (!task || !task.continueNotes || task.continueNotes.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            list.innerHTML = task.continueNotes.map(item => `
+                <div class="bg-slate-900/90 p-2.5 rounded-lg border border-indigo-900/50 text-xs text-slate-200 flex justify-between items-start gap-2">
+                    <span class="break-words flex-1"><i class="fa-solid fa-arrow-right-long text-indigo-400 mr-1 text-[10px]"></i>${item.text}</span>
+                    <span class="text-[9px] text-indigo-300/70 bg-indigo-950 px-1.5 py-0.5 rounded shrink-0">${item.time}</span>
+                </div>
+            `).join('');
         }
 
         function deleteTask() {
@@ -672,7 +755,7 @@
             
             if (task) {
                 focusTaskNameForPiP = task.name;
-                task.status = 'running'; // DITANDAI SEDANG BERJALAN
+                task.status = 'running';
                 saveState();
             } else {
                 focusTaskNameForPiP = "Fokus Bebas";
@@ -716,7 +799,6 @@
             document.getElementById('focus-mode').classList.add('hidden');
             document.getElementById('floating-timer').classList.add('hidden');
             
-            // Kembalikan status ke dijeda
             const task = appState.tasks.find(t => t.id === currentEditingId);
             if(task && task.status === 'running') {
                 task.status = 'paused';
@@ -887,6 +969,7 @@
             requestAnimationFrame(drawPiPFrame);
         }
 
+        // AUTO-PIP KETIKA PINDAH TAB / MEMBUKA WEB LAIN
         document.addEventListener("visibilitychange", async () => {
             if (compactTimerWindow && !compactTimerWindow.closed) return;
             if (document.hidden && isTimerRunning) {
@@ -934,12 +1017,13 @@
                 appState.stats.completed += 1; 
             } else if (status === 'continue' && task) {
                 task.status = 'paused';
-                const note = document.getElementById('continue-notes').value.trim();
+                const noteText = document.getElementById('continue-notes').value.trim();
                 
-                if(note) {
-                    const timeNow = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    const noteEntry = `\n\n[Jeda - ${timeNow}]: ${note}`;
-                    task.notes = (task.notes || "") + noteEntry;
+                if(noteText) {
+                    if(!task.continueNotes) task.continueNotes = [];
+                    const timeNow = getFormattedTime();
+                    // Catatan lanjutan disimpan terpisah
+                    task.continueNotes.unshift({ id: Date.now().toString(), text: noteText, time: timeNow });
                 }
             }
 
@@ -953,7 +1037,8 @@
             const text = input.value.trim();
             if(!text) return;
             
-            appState.parkedIdeas.push({ text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            const timeStamp = getFormattedTime();
+            appState.parkedIdeas.push({ text, time: timeStamp });
             appState.stats.parked += 1;
             saveState();
             input.value = ''; 
@@ -998,9 +1083,9 @@
                             <span class="bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-1 rounded-md border border-indigo-500/30 whitespace-nowrap self-start shrink-0 shadow-sm shadow-indigo-500/20"><i class="fa-solid fa-bolt text-orange-400 mr-1"></i> Prioritas 1</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-2 bg-slate-950/80 p-2.5 rounded-lg inline-block w-full break-words box-border border border-slate-800"><i class="fa-solid fa-robot mr-1 text-slate-500"></i> ${top._reason}</p>
-                        <div class="flex items-center gap-2 mt-4">
+                        <div class="flex items-center justify-between mt-4">
                             <div class="bg-indigo-600 px-3 py-1.5 rounded text-xs text-white font-medium shadow-lg shadow-indigo-500/20"><i class="fa-solid fa-play mr-1"></i> Lanjut Kerjakan</div>
-                            <div class="text-xs text-slate-400">Klik untuk melihat rincian</div>
+                            ${top.createdAt ? `<span class="text-[10px] text-slate-500"><i class="fa-regular fa-clock mr-1"></i>${top.createdAt}</span>` : ''}
                         </div>
                     </div>`;
             } else {
@@ -1026,10 +1111,11 @@
 
                 return `
                 <div onclick="openTaskDetail('${t.id}')" class="task-card glass-panel rounded-xl p-4 cursor-pointer w-full box-border border border-slate-700/50 hover:bg-slate-800/50">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-1 w-full">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-1 w-full mb-2">
                         <h4 class="font-medium text-slate-200 leading-tight break-words flex-1 pr-2">${t.name}</h4>
                         ${statusBadge}
                     </div>
+                    ${t.createdAt ? `<div class="text-[10px] text-slate-500 flex items-center gap-1"><i class="fa-regular fa-clock"></i> Diinput ${t.createdAt}</div>` : ''}
                 </div>`;
             };
 
